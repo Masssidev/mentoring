@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+             "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="net.skhu.mapper.MentorMapper">
+
+	<select id="findOne" resultType="Mentor">
+		select m.*, u.name, u.type, u.user_id, fi.path i_path, ft.path t_path, fd.path d_path, count(t.group_m_apply_id)-1 mentee_count
+		from mentor_apply m
+		left join user u on m.mentor_u_id=u.id
+		left join file fi on m.apply_f_intro_fk = fi.id
+		left join file ft on m.apply_f_time_id = ft.id
+		left join file fd on m.apply_f_doc_fk = fd.id
+		left join team t on m.id = t.group_m_apply_id
+		where m.id = #{m.id}
+		group by t.group_m_apply_id
+	</select>
+	
+	<select id="findByMentor_u_id" resultType="Mentor">
+		select m.*, u.name, u.type, u.user_id, fi.path i_path, ft.path t_path, fd.path d_path, count(t.group_m_apply_id)-1 mentee_count
+		from mentor_apply m
+		left join user u on m.mentor_u_id=u.id
+		left join file fi on m.apply_f_intro_fk = fi.id
+		left join file ft on m.apply_f_time_id = ft.id
+		left join file fd on m.apply_f_doc_fk = fd.id
+		left join team t on m.id = t.group_m_apply_id
+		where mentor_u_id = #{mentor_u_id}
+		group by t.group_m_apply_id
+	</select>
+	
+	<select id="findMentor" resultType="Mentor">
+		select m.*, u.name, u.type, u.user_id, fi.path i_path, ft.path t_path, fd.path d_path, count(t.group_m_apply_id)-1 mentee_count
+		from mentor_apply m
+		left join user u on m.mentor_u_id=u.id
+		left join file fi on m.apply_f_intro_fk = fi.id
+		left join file ft on m.apply_f_time_id = ft.id
+		left join file fd on m.apply_f_doc_fk = fd.id
+		left join team t on m.id = t.group_m_apply_id
+		where u.type = 3
+		group by t.group_m_apply_id
+	</select>
+	
+	<select id="findAll" resultType="Mentor">
+		select m.*, u.name, u.type, u.user_id, fi.path i_path, ft.path t_path, fd.path d_path
+		from mentor_apply m
+		left join user u on m.mentor_u_id=u.id
+		left join file fi on m.apply_f_intro_fk = fi.id
+		left join file ft on m.apply_f_time_id = ft.id
+		left join file fd on m.apply_f_doc_fk = fd.id
+		order by u.type;
+	</select>
+	
+	<insert id="insert_apply" useGeneratedKeys="true" keyProperty="id">
+		INSERT mentor_apply (mentor_u_id, group_name, subject, year, grade, count, study_purpose, study_content, study_method, apply_f_time_id, apply_f_intro_fk, apply_f_doc_fk)
+		VALUES (#{mentor_u_id}, #{group_name}, #{subject}, #{year}, #{grade}, #{count}, #{study_purpose}, #{study_content}, #{study_method}, #{apply_f_time_id}, #{apply_f_intro_fk}, #{apply_f_doc_fk})
+	</insert>
+	
+	<insert id="insert_report" useGeneratedKeys="true" keyProperty="id">
+		INSERT report (subject, place, day, start_time, end_time, study_content, rep_f_photo_id, rep_u_id, rep_f_study_id, create_date)
+		VALUES (#{subject}, #{place}, #{day}, #{start_time}, #{end_time}, #{study_content}, #{rep_f_photo_id}, #{rep_u_id}, #{rep_f_study_id}, now())
+	</insert>
+	
+	<update id="update_report">
+		UPDATE report
+		<set>
+			subject = #{param2.subject},
+			place = #{param2.place},
+			day = #{param2.day},
+			start_time = #{param2.start_time},
+			end_time = #{param2.end_time},
+			study_content = #{param2.study_content},
+			<if test="param2.rep_f_photo_id != 0">rep_f_photo_id = #{param2.rep_f_photo_id},</if> 
+			<if test="param2.rep_f_study_id != 0">rep_f_study_id = #{param2.rep_f_study_id},</if> 
+			create_date = now()
+		</set>	 
+		WHERE id = #{param1}
+	</update>
+	
+	<update id="update">
+		UPDATE mentor_apply SET
+			group_name = #{group_name}, subject = #{subject},
+			year = #{year}, grade = #{grade}, count = #{count},
+			study_purpose = #{study_purpose}, study_content = #{study_content}, study_method = #{study_method},
+			apply_f_time_id = #{apply_f_time_id}, apply_f_intro_fk = #{apply_f_intro_fk}, apply_f_doc_fk = #{apply_f_doc_fk}
+		WHERE mentor_u_id = #{mentor_u_id}
+	</update>
+	
+	<update id="update_m_condition">
+		UPDATE mentor_apply SET
+			m_condition = #{m_condition}
+		WHERE id = #{id}
+	</update>
+	
+	<delete id="delete">
+	    DELETE FROM mentor_apply WHERE id = #{id}
+	</delete>
+	
+	<update id="deleteMyReport">
+	    update report set rep_condition=1 WHERE id = #{id}
+	</update>
+
+</mapper>

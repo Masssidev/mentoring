@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+             "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="net.skhu.mapper.TimetableMapper">
+
+	<select id="findAllTeamItem" resultType="TimetableDTO">
+		SELECT t.*, u.name from timetable t join user u on t.time_user_id = u.id
+		where time_apply_id = #{param1}
+	</select>
+
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id">
+		INSERT timetable (day, time, time_apply_id, time_user_id)
+		VALUES (#{param1}, #{param2}, #{param3}, #{param4})
+	</insert>
+	
+	<delete id="delete">
+		delete from timetable 
+		where time_apply_id=#{param1}
+		and time_user_id = #{param2}
+	</delete>
+	
+	<select id="findMyTimeTable" resultType="TimetableDTO">
+		SELECT * from timetable where time_user_id = #{param1}
+	</select>
+	
+</mapper>

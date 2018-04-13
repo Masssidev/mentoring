@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+             "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="net.skhu.mapper.IntroduceMapper">
+
+	<select id="findAll" resultType="Introduce">
+		SELECT * FROM introduce
+	</select>
+	
+	<select id="findOne" resultType="Introduce">
+		SELECT * FROM introduce WHERE id=#{id}
+	</select>
+	
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id">
+	  INSERT introduce (content, title)
+	  VALUES (#{content}, #{title})
+	</insert>
+	
+	<update id="update">
+		UPDATE introduce SET content=#{content}, title=#{title} WHERE id=#{id}
+	</update>
+	
+	<delete id="delete">
+	  DELETE FROM introduce WHERE id = #{id}
+	</delete>
+
+
+</mapper>
+

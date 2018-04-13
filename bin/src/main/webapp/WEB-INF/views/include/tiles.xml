@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE tiles-definitions PUBLIC
+     "-//Apache Software Foundation//DTD Tiles Configuration 3.0//EN"
+     "http://tiles.apache.org/dtds/tiles-config_3_0.dtd">
+<tiles-definitions>
+
+  <definition name="layout_user" template="/WEB-INF/views/include/layout.jsp">
+    <put-attribute name="user_menu" value="/WEB-INF/views/include/menu_user.jsp" />
+    <put-attribute name="manager_menu" value="/WEB-INF/views/include/menu_manager.jsp" />
+    <put-attribute name="body" value="" />
+  </definition>
+  
+  <definition name="*" extends="layout_user">
+    <put-attribute name="body" value="/WEB-INF/views/guest/{1}.jsp" />
+  </definition>
+  
+  <definition name="*" extends="layout_user">
+    <put-attribute name="body" value="/WEB-INF/views/manager/{1}.jsp" />
+  </definition>
+  
+  <definition name="*" extends="layout_user">
+    <put-attribute name="body" value="/WEB-INF/views/mentee/{1}.jsp" />
+  </definition>
+  
+  <definition name="*" extends="layout_user">
+    <put-attribute name="body" value="/WEB-INF/views/mentor/{1}.jsp" />
+  </definition>
+  
+  <definition name="*" extends="layout_user">
+    <put-attribute name="body" value="/WEB-INF/views/user/{1}.jsp" />
+  </definition>
+  
+   <definition name="*" extends="layout_user">
+    <put-attribute name="body" value="/WEB-INF/views/{1}.jsp" />
+  </definition>
+
+</tiles-definitions>

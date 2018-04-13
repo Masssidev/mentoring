@@ -1,0 +1,356 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+             "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="net.skhu.mapper.UserMapper">
+
+	<select id="findOneByUser_id" resultType="User">
+		SELECT * FROM user
+		WHERE user_id = #{user_id}
+	</select>
+
+	<select id="findOneById" resultType="User">
+		SELECT * FROM user
+		WHERE id =
+		#{id}
+	</select>
+
+	<select id="findStudyCount" resultType="int">
+		SELECT study_count FROM
+		setting
+		order by id desc
+		limit 0, 1
+	</select>
+
+	<select id="findStartSM" resultType="String">
+		SELECT sm_start_date FROM
+		setting
+		order by id desc
+		limit 0, 1
+	</select>
+
+	<select id="findAll" resultType="User">
+		SELECT * FROM user u WHERE
+		u.condition=0
+	</select>
+
+	<select id="findAllManager" resultType="User">
+		SELECT u.*, d.d_name,
+		s.status_name
+		FROM department d right join user u
+		ON d.id=u.major_id
+		left join status s
+		on u.status_id=s.id
+		WHERE type=2 and u.auth_date between #{param1} and #{param2};
+	</select>
+
+	<select id="findAllReports" resultType="Report">
+	<bind name="start" value="(pg - 1) * sz" />
+		SELECT r.*, m.group_name
+		FROM report r left join mentor_apply m on r.rep_u_id=m.mentor_u_id
+		ORDER BY
+		<choose>
+			<when test="ob == 0">m.group_name</when>
+			<when test="ob == 1">r.create_date</when>
+			<when test="ob == 2">r.create_date desc</when>
+			<otherwise>r.id</otherwise>
+		</choose>
+		LIMIT ${start}, ${sz}
+	</select>
+	
+	<select id="findAllBySearch" resultType="Report">
+		SELECT r.*, m.group_name
+		FROM report r left join mentor_apply m on r.rep_u_id=m.mentor_u_id
+		where r.create_date between #{param1} and #{param2}
+	</select>
+	
+
+	<select id="count" resultType="int">
+		SELECT COUNT(*) FROM report
+	</select>
+
+	<select id="findAllWithReports" resultMap="resultMap1">
+		SELECT m.*, r.id
+		report_id, r.subject rep_subject, r.place, r.create_date
+		FROM
+		mentor_apply m inner JOIN report r ON m.mentor_u_id = r.rep_u_id
+	</select>
+
+	<resultMap id="resultMap1" type="Mentor">
+		<id property="id" column="id" />
+		<result property="group_name" column="group_name" />
+		<collection property="reports" ofType="Report">
+			<id property="id" column="report_id" />
+			<result property="subject" column="rep_subject" />
+			<result property="place" column="place" />
+			<result property="create_date" column="create_date" />
+		</collection>
+	</resultMap>
+
+	<select id="findAllReportsByWriter" resultType="Report">
+		SELECT *
+		FROM
+		report
+		where rep_u_id=#{id} and rep_condition=0
+	</select>
+
+	<select id="findAllCommentsByWriter" resultType="Comment">
+		SELECT c.*,
+		a.art_b_id
+		FROM comment c join article a
+		ON c.com_a_id= a.id
+		where
+		c.com_u_id=#{id} and c.com_condition=0
+	</select>
+
+	<select id="findAllReportsById" resultType="Report">
+		SELECT distinct r.*
+		FROM team t join mentor_apply m on t.group_m_apply_id=m.id JOIN report
+		r
+		ON m.mentor_u_id = r.rep_u_id
+		where t.group_mentee_id=#{id} and
+		r.rep_condition=0
+	</select>
+
+	<select id="findAllCondition" resultType="Report">
+		SELECT m.group_name, u.name, count(r.rep_u_id) reportCount
+		FROM mentor_apply m JOIN report r ON m.mentor_u_id = r.rep_u_id join user u on m.mentor_u_id=u.id
+		group by r.rep_u_id
+	</select>
+	
+	<select id="findAllConditionById" resultType="Report">
+		SELECT
+		m.group_name, count(r.rep_u_id) reportCount
+		FROM team t join
+		mentor_apply m on t.group_m_apply_id=m.id JOIN report r
+		ON
+		m.mentor_u_id = r.rep_u_id
+		where t.group_mentee_id=#{id} and
+		r.rep_condition=0 group by r.rep_u_id
+	</select>
+
+	<select id="findOneReport" resultType="Report">
+		SELECT * FROM report where
+		id=#{id}
+	</select>
+
+	<select id="findType" resultType="int">
+		SELECT type FROM user where
+		id=#{id}
+	</select>
+
+	<select id="findAllMentor" resultType="User">
+		SELECT u.*, d.d_name,
+		s.status_name
+		FROM department d right join user u
+		ON d.id=u.major_id
+		left join status s
+		on u.status_id=s.id
+		WHERE type=3 and u.auth_date between #{param1} and #{param2}
+	</select>
+
+	<select id="findAllMentee" resultType="User">
+		SELECT u.*, d.d_name,
+		s.status_name
+		FROM department d right join user u
+		ON d.id=u.major_id
+		left join status s
+		on u.status_id=s.id
+		WHERE type=4 and u.auth_date between #{param1} and #{param2};
+	</select>
+
+	<select id="findAllUser" resultType="User">
+		SELECT u.*, d.d_name,
+		s.status_name
+		FROM department d right join user u
+		ON d.id=u.major_id
+		left join status s
+		on u.status_id=s.id
+		WHERE type=1 and u.auth_date between #{param1} and #{param2};
+	</select>
+	
+	<select id="findByName" resultType="User">
+		SELECT u.*, d.d_name,
+		s.status_name
+		FROM department d right join user u
+		ON d.id=u.major_id
+		left join status s
+		on u.status_id=s.id
+		WHERE u.name LIKE CONCAT('%',
+		#{keyword}, '%');
+	</select>
+	
+	<select id="findByUserName" resultType="User">
+		SELECT u.*, d.d_name,
+		s.status_name
+		FROM department d right join user u
+		ON d.id=u.major_id
+		left join status s
+		on u.status_id=s.id
+		WHERE u.name LIKE CONCAT('%',
+		#{keyword}, '%') and u.type=1;
+	</select>
+	
+	<select id="findByManagerName" resultType="User">
+		SELECT u.*, d.d_name,
+		s.status_name
+		FROM department d right join user u
+		ON d.id=u.major_id
+		left join status s
+		on u.status_id=s.id
+		WHERE u.name LIKE CONCAT('%',
+		#{keyword}, '%') and u.type=2;
+	</select>
+	
+	<select id="findByMentorName" resultType="User">
+		SELECT u.*, d.d_name,
+		s.status_name
+		FROM department d right join user u
+		ON d.id=u.major_id
+		left join status s
+		on u.status_id=s.id
+		WHERE u.name LIKE CONCAT('%',
+		#{keyword}, '%') and u.type=3;
+	</select>
+	
+	<select id="findByMenteeName" resultType="User">
+		SELECT u.*, d.d_name,
+		s.status_name
+		FROM department d right join user u
+		ON d.id=u.major_id
+		left join status s
+		on u.status_id=s.id
+		WHERE u.name LIKE CONCAT('%',
+		#{keyword}, '%') and u.type=4;
+	</select>
+
+	<update id="update">
+		UPDATE user SET pw = #{pw}, email = #{email}, phone =
+		#{phone} WHERE id =
+		#{id}
+	</update>
+
+	<update id="type_update">
+		UPDATE user SET type = #{type} WHERE id = #{id}
+	</update>
+
+	<update id="auth_update">
+		UPDATE User
+		<set>
+			<if test="param1==2">type=1,</if>
+			<if test="param1==1">type=2,</if>
+			auth_date=now()
+		</set>
+		WHERE id = #{param2}
+	</update>
+
+	<select id="findManagerByTerm" resultType="User">
+		SELECT u.*, d.d_name, s.status_name
+		FROM department d right join user u ON d.id=u.major_id left join status s on u.status_id=s.id
+		WHERE u.auth_date between #{param1} and #{param2}
+		AND u.type=2
+	</select>
+
+	<select id="findMentorByTerm" resultType="User">
+		SELECT u.*, d.d_name, s.status_name
+		FROM department d right join user u ON d.id=u.major_id left join status s on u.status_id=s.id
+		WHERE u.auth_date between #{param1} and #{param2}
+		AND u.type=3
+	</select>
+
+	<select id="findMenteeByTerm" resultType="User">
+		SELECT u.*, d.d_name, s.status_name
+		FROM department d right join user u ON d.id=u.major_id left join status s on u.status_id=s.id
+		WHERE u.auth_date between #{param1} and #{param2}
+		AND u.type=4
+	</select>
+
+	<select id="findUserByTerm" resultType="User">
+		SELECT u.*, d.d_name, s.status_name
+		FROM department d right join user u ON d.id=u.major_id left join status s on u.status_id=s.id
+		WHERE u.auth_date between #{param1} and #{param2}
+		AND u.type=1
+	</select>
+
+	<insert id="insertWithMinor" useGeneratedKeys="true"
+		keyProperty="id">
+		INSERT user (user_id, pw, name, email, phone, office,
+		office_tel, type,
+		major_id, status_id, auth_date, minor_id)
+		VALUES
+		(#{user_id}, #{pw}, #{name}, #{email}, #{phone}, #{office},
+		#{office_tel}, #{type}, #{major_id}, #{status_id}, now(), #{minor_id})
+	</insert>
+
+	<insert id="insertWithDouble" useGeneratedKeys="true"
+		keyProperty="id">
+		INSERT user (user_id, pw, name, email, phone, office,
+		office_tel, type,
+		major_id, status_id, auth_date, double_id)
+		VALUES
+		(#{user_id}, #{pw}, #{name}, #{email}, #{phone}, #{office},
+		#{office_tel}, #{type}, #{major_id}, #{status_id}, now(),
+		#{double_id})
+	</insert>
+
+	<insert id="insertWithDep" useGeneratedKeys="true" keyProperty="id">
+		INSERT user (user_id, pw, name, email, phone, office, office_tel,
+		type, major_id, status_id, auth_date)
+		VALUES (#{user_id}, #{pw},
+		#{name}, #{email}, #{phone}, #{office},
+		#{office_tel}, #{type},
+		#{major_id}, #{status_id}, now())
+	</insert>
+
+	<insert id="insertWithExcel" useGeneratedKeys="true"
+		keyProperty="id">
+		INSERT user (user_id, pw, name, email, phone, type,
+		major_id, status_id, auth_date)
+		VALUES (#{user_id},
+		#{pw}, #{name}, #{email}, #{phone}, #{type},
+		#{major_id}, #{status_id}, now())
+	</insert>
+
+	<delete id="delete">
+		DELETE FROM user WHERE id = #{id}
+	</delete>
+
+	<update id="dropUser">
+		UPDATE user u SET u.condition = 1 WHERE id = #{id}
+	</update>
+
+	<insert id="m_setting" useGeneratedKeys="true" keyProperty="id">
+		INSERT into setting (mentor_start_date, mentor_expire_date,
+		mentee_start_date, mentee_expire_date, sm_start_date, sm_expire_date,
+		study_count, max_mentor, max_mentee, min_mentee, report_deadline)
+		VALUES (#{mentor_start_date}, #{mentor_expire_date},
+		#{mentee_start_date}, #{mentee_expire_date}, #{sm_start_date},
+		#{sm_expire_date}, #{study_count}, #{max_mentor}, #{max_mentee},
+		#{min_mentee}, #{report_deadline})
+	</insert>
+	
+	<update id="m_survey">
+		update setting set survey = #{link} where id= #{id}
+	</update>
+	
+	<select id="findSetting" resultType="Setting">
+		SELECT *
+		FROM setting
+		ORDER BY id desc
+		limit 1;
+	</select>
+
+	<select id="selectExcelList" fetchSize="100" resultType="Report">
+		SELECT
+		u.name, r.subject, r.place, r.day, r.start_time, r.end_time,
+		r.study_content, r.create_date, m.group_name
+		FROM report r left join
+		user u on r.rep_u_id=u.id left join mentor_apply m on
+		m.mentor_u_id=u.id
+		WHERE r.id=#{id}
+	</select>
+
+	<delete id="deleteReport">
+		delete from report where id=#{id}
+	</delete>
+</mapper>

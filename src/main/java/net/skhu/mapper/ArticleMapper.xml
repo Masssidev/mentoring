@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+             "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="net.skhu.mapper.ArticleMapper">
+
+	<!-- <select id="findAllByBoard" resultType="Article">
+		SELECT a.*,u.name "userName" FROM article a LEFT JOIN user u ON a.art_u_id=u.id WHERE a.art_b_id = #{art_b_id} AND a.condition=0
+	</select> -->
+	
+	<select id="findAllByBoard" resultType="Article">
+	    <bind name="start" value="(pg - 1) * sz" />
+	    SELECT a.*, u.name "userName" 
+	    FROM article a LEFT JOIN user u ON a.art_u_id=u.id
+	    WHERE a.art_b_id = #{bd} AND a.condition=0
+	    LIMIT ${start}, ${sz}
+	  </select>
+	 
+	  <select id="count" resultType="int">
+	    SELECT COUNT(a.id) 
+	    FROM article a LEFT JOIN user u ON a.art_u_id=u.id
+	    WHERE a.art_b_id = #{bd} AND a.condition=0  
+	  </select>
+	  
+	<select id="findAllByBoardAndUser" resultType="Article">
+		<bind name="start" value="(pagination.pg - 1) * pagination.sz" />
+	    SELECT a.*, u.name "userName"
+	    FROM article a LEFT JOIN user u ON a.art_u_id=u.id
+	    WHERE a.art_b_id = #{pagination.bd} AND a.art_u_id=#{u_id} AND a.condition=0
+	    LIMIT ${start}, ${pagination.sz}
+	  </select>
+	  
+	  <select id="countByUser" resultType="int">
+	    SELECT COUNT(a.id) 
+	    FROM article a LEFT JOIN user u ON a.art_u_id=u.id
+	    WHERE a.art_b_id = #{pagination.bd} AND a.art_u_id=#{u_id} AND a.condition=0  
+	  </select>
+	  
+	<select id="findByUser" resultType="Article">
+		SELECT * FROM article WHERE art_u_id=#{art_u_id}
+	</select>
+	
+	
+	<select id="findOne" resultType="Article">
+		SELECT a.*, u.name "userName" 
+	    FROM article a LEFT JOIN user u ON a.art_u_id=u.id WHERE a.id = #{id}
+	</select>
+	
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id">
+	  INSERT article (title, content, art_u_id, post_date, art_b_id, art_f_id)
+	  VALUES (#{title}, #{content}, #{art_u_id}, now(), #{art_b_id}, #{art_f_id})
+	</insert>
+	
+	<insert id="insertNoFile" useGeneratedKeys="true" keyProperty="id">
+	  INSERT article (title, content, art_u_id, post_date, art_b_id)
+	  VALUES (#{title}, #{content}, #{art_u_id}, now(), #{art_b_id})
+	</insert>
+	
+	<update id="update2">
+	  UPDATE article SET 
+	    title = #{title}, 
+	    content = #{content}, 
+	    post_date = now(),
+	    art_f_id = #{art_f_id}
+	  WHERE id = #{id}
+	</update>
+	
+	<update id="update">
+	  UPDATE article
+	  <set>
+	  	<if test="title != null">title = #{title},</if> 
+	    <if test="content != null">content = #{content},</if> 
+	    post_date = now(),
+	    <if test="art_f_id != 0">art_f_id = #{art_f_id}</if>
+	  </set>
+	  WHERE id = #{id}
+	</update>
+	
+	<select id="delete" resultType="Article">
+	  UPDATE article a SET a.condition=1 WHERE id = #{id}
+	</select>
+
+</mapper>

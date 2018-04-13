@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+             "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="net.skhu.mapper.CommentMapper">
+
+	<select id="findAllByArticle" resultType="Comment">
+		select c.*, u.name from comment c left join user u on c.com_u_id=u.id where c.com_a_id=#{com_a_id} and c.com_condition=0
+	</select>
+	
+	<select id="findAllByUser" resultType="Comment">
+		select * from comment c where c.com_u_id=#{com_u_id} and c.com_condition=0
+	</select>
+	
+	<select id="findOne" resultType="Comment">
+		select * from comment c where c.id=#{id}
+	</select>
+	
+	<select id="countByArticle" resultType="int">
+		select count(*) from comment where com_a_id=#{com_a_id} and com_condition=0 and com_u_id!=#{com_u_id}
+	</select>
+	
+	<update id="delete">
+	    update comment c set c.com_condition=1 where id=#{id}
+	</update>
+	
+	<update id="update">
+		UPDATE comment set c_content=#{c_content}, c_post_date=sysdate() where id=#{id}
+	</update>
+	
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id">
+	    insert into comment(c_content, c_post_date, com_u_id, com_a_id) values(#{c_content}, sysdate(), #{com_u_id}, #{com_a_id})
+	</insert>
+	
+	
+	<select id="findBoardId" resultType="Article">
+		SELECT c.com_a_id id, a.art_b_id
+        FROM comment c join article a
+        ON c.com_a_id= a.id
+        where c.id=#{id} and c.com_condition=0
+    </select>
+</mapper>
