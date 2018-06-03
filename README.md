@@ -13,7 +13,7 @@
 <hr/>
 
 ## Maven dependency
-  <dependencies>
+  	<dependencies>
 		<dependency>
 			<groupId>org.mybatis.spring.boot</groupId>
 			<artifactId>mybatis-spring-boot-starter</artifactId>
@@ -108,5 +108,5 @@
 ![image](https://user-images.githubusercontent.com/33171233/40888172-418a5f18-678e-11e8-8e23-25418c0137ac.png)
 <hr/>
 
-##수상
+## 수상
 * 2018년 성공회대 스프트웨어 경진대회 지정주제 2
